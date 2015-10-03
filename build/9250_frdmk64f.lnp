@@ -1,0 +1,6 @@
+--cpu Cortex-M4.fp
+".\build\main.o"
+--strict --scatter "mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/MK64F.sct"
+mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/sys.o mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/mbed_overrides.o mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/system_MK64F12.o mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/startup_MK64F12.o mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/board.o mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/cmsis_nvic.o mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/retarget.o mbed/TARGET_K64F/TOOLCHAIN_ARM_STD/mbed.ar --summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\build\9250_frdmk64f.map" -o .\build\9250_frdmk64f.axf
