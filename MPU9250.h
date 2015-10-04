@@ -9,6 +9,8 @@
 #else
 #error Target not supported
 #endif
+#define PI 3.14159265358979323846
+
 // See also MPU-9250 Register Map and Descriptions, Revision 4.0, RM-MPU-9250A-00, Rev. 1.4, 9/9/2013 for registers not listed in 
 // above document; the MPU9250 and MPU9150 are virtually identical but the latter has a different register map
 //
@@ -219,7 +221,6 @@ class MPU9250 {
         int count;  // used to control display output rate
 
         // parameters for 6 DoF sensor fusion calculations
-        float PI;
         float GyroMeasError;     // gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
         float beta;  // compute beta
         float GyroMeasDrift;      // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
@@ -276,7 +277,6 @@ class MPU9250 {
                 count = 0;  // used to control display output rate
 
                 // parameters for 6 DoF sensor fusion calculations
-                PI = 3.14159265358979323846f;
                 GyroMeasError = PI * (60.0f / 180.0f);     // gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
                 beta = sqrt(3.0f / 4.0f) * GyroMeasError;  // compute beta
                 GyroMeasDrift = PI * (1.0f / 180.0f);      // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
