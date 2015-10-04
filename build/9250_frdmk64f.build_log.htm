@@ -29,17 +29,37 @@ Project File Date:  10/03/2015
 Rebuild target 'mbed FRDM-K64F'
 compiling main.cpp...
 "main.cpp": using precompiled header file "build\main.pch"
-linking...
-Program Size: Code=17872 RO-data=3720 RW-data=48 ZI-data=452  
-After Build - User command #1: fromelf --bin -o E:\9250_frdmk64f_K64F.bin build\9250_frdmk64f.axf
-".\build\9250_frdmk64f.axf" - 0 Error(s), 0 Warning(s).
+mbed\rtc_time.h(81): error:  #219: error while deleting file "build\main.pch": Permission denied
+  void attach_rtc(time_t (*read_rtc)(void), void (*write_rtc)(time_t), void (*init_rtc)(void), int (*isenabled_rtc)(void));
+main.cpp: 0 warnings, 1 error
+compiling MPU9250.cpp...
+"MPU9250.cpp": using precompiled header file "build\MPU9250.pch"
+MPU9250.cpp(430): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[0] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[0] - 1.0) )); // FT[Xa] factory trim calculation
+MPU9250.cpp(431): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[1] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[1] - 1.0) )); // FT[Ya] factory trim calculation
+MPU9250.cpp(432): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[2] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[2] - 1.0) )); // FT[Za] factory trim calculation
+MPU9250.cpp(433): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[3] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[3] - 1.0) )); // FT[Xg] factory trim calculation
+MPU9250.cpp(434): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[4] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[4] - 1.0) )); // FT[Yg] factory trim calculation
+MPU9250.cpp(435): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[5] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[5] - 1.0) )); // FT[Zg] factory trim calculation
+MPU9250.cpp(440): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+       destination[i] = 100.0*((float)(aSTAvg[i] - aAvg[i]))/factoryTrim[i]; // Report percent differences
+MPU9250.cpp(441): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+       destination[i+3] = 100.0*((float)(gSTAvg[i] - gAvg[i]))/factoryTrim[i+3]; // Report percent differences
+MPU9250.cpp: 8 warnings, 0 errors
+".\build\9250_frdmk64f.axf" - 1 Error(s), 8 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
   C:\Users\Arunkumar\OneDrive\Gyro-mag-FRDM\RTE
   C:\Keil_v5\ARM\PACK\Keil\Kinetis_K60_DFP\1.4.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:02
+Target not created.
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>
