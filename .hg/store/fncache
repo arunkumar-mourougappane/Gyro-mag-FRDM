@@ -1,0 +1,5 @@
+data/main.cpp.i
+data/N5110.lib.i
+data/ST_401_84MHZ.lib.i
+data/MPU9250.h.i
+data/mbed.bld.i

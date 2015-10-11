@@ -1,89 +1,126 @@
 #include "mbed.h"
 #include "MPU9250.h"
-DigitalOut myled(LED_GREEN);
-Serial pc(USBTX, USBRX);
-MPU9250 mpu9250;
-Timer t;
+
+
+float sum = 0;
+uint32_t sumCount = 0;
+char buffer[14];
+
+   MPU9250 mpu9250;
+   
+   Timer t;
+
+   Serial pc(USBTX, USBRX); // tx, rx
+
 int main()
 {
-    float sum = 0;
-    uint32_t sumCount = 0;
+  pc.baud(38400);  
 
-    pc.baud(19200);
-    pc.printf("Hello World!\n");
-    i2c.frequency(400000);
-    pc.printf("CPU SystemCoreClock is %d Hz\r\n", SystemCoreClock);
-    t.start();
-        uint8_t whoami = mpu9250.readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250);  // Read WHO_AM_I register for MPU-9250
-       pc.printf("I AM 0x%x\n\r", whoami); pc.printf("I SHOULD BE 0x71\n\r");
-       if(whoami==0x71)
-        {
-            pc.printf("MPU9250 is online...\n\r");
-            wait(0.5f); // wait a small period of time
-            mpu9250.resetMPU9250(); // Reset registers to default in preparation for device calibration
-            mpu9250.calibrateMPU9250(mpu9250.gyroBias, mpu9250.accelBias); // Calibrate gyro and accelerometers, load biases in bias registers  
-            pc.printf("x gyro bias = %f\n\r", mpu9250.gyroBias[0]);
-            pc.printf("y gyro bias = %f\n\r", mpu9250.gyroBias[1]);
-            pc.printf("z gyro bias = %f\n\r", mpu9250.gyroBias[2]);
-            pc.printf("x accel bias = %f\n\r", mpu9250.accelBias[0]);
-            pc.printf("y accel bias = %f\n\r", mpu9250.accelBias[1]);
-            pc.printf("z accel bias = %f\n\r", mpu9250.accelBias[2]);
-            wait(2);
-            mpu9250.initMPU9250(); 
-            pc.printf("MPU9250 initialized for active data mode....\n\r"); // Initialize device for active mode read of acclerometer, gyroscope, and temperature
-            mpu9250.initAK8963(mpu9250.magCalibration);
-            pc.printf("AK8963 initialized for active data mode....\n\r"); // Initialize device for active mode read of magnetometer
-            pc.printf("Accelerometer full-scale range = %f  g\n\r", 2.0f*(float)(1<<mpu9250.Ascale));
-            pc.printf("Gyroscope full-scale range = %f  deg/s\n\r", 250.0f*(float)(1<<mpu9250.Gscale));
-            if(mpu9250.Mscale == 0) pc.printf("Magnetometer resolution = 14  bits\n\r");
-            if(mpu9250.Mscale == 1) pc.printf("Magnetometer resolution = 16  bits\n\r");
-            if(mpu9250.Mmode == 2) pc.printf("Magnetometer ODR = 8 Hz\n\r");
-            if(mpu9250.Mmode == 6) pc.printf("Magnetometer ODR = 100 Hz\n\r");
-            wait(2);
-        }
-        else
-        {
-                 pc.printf("Could not connect to MPU9250: \n\r");
-                 pc.printf("%#x \n",  whoami);
-                while(true);
-        }
-        mpu9250.getAres(); // Get accelerometer sensitivity
-        mpu9250.getGres(); // Get gyro sensitivity
-        mpu9250.getMres(); // Get magnetometer sensitivity
-        pc.printf("Accelerometer sensitivity is %f LSB/g \n\r", 1.0f/mpu9250.aRes);
-        pc.printf("Gyroscope sensitivity is %f LSB/deg/s \n\r", 1.0f/mpu9250.gRes);
-        pc.printf("Magnetometer sensitivity is %f LSB/G \n\r", 1.0f/mpu9250.mRes);
-        mpu9250.magbias[0] = +470.;  // User environmental x-axis correction in milliGauss, should be automatically calculated
-        mpu9250.magbias[1] = +120.;  // User environmental x-axis correction in milliGauss
-        mpu9250.magbias[2] = +125.;  // User environmental x-axis correction in milliGauss
-    while (true) {
-         if(mpu9250.readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01) {  // On interrupt, check if data ready interrupt
-
-    mpu9250.readAccelData(mpu9250.accelCount);  // Read the x/y/z adc values   
-    // Now we'll calculate the accleration value into actual g's
-    mpu9250.ax = (float)mpu9250.accelCount[0]*mpu9250.aRes - mpu9250.accelBias[0];  // get actual g value, this depends on scale being set
-    mpu9250.ay = (float)mpu9250.accelCount[1]*mpu9250.aRes - mpu9250.accelBias[1];   
-    mpu9250.az = (float)mpu9250.accelCount[2]*mpu9250.aRes - mpu9250.accelBias[2];  
-   
-    mpu9250.readGyroData(mpu9250.gyroCount);  // Read the x/y/z adc values
-    // Calculate the gyro value into actual degrees per second
-    mpu9250.gx = (float)mpu9250.gyroCount[0]*mpu9250.gRes - mpu9250.gyroBias[0];  // get actual gyro value, this depends on scale being set
-    mpu9250.gy = (float)mpu9250.gyroCount[1]*mpu9250.gRes - mpu9250.gyroBias[1];  
-    mpu9250.gz = (float)mpu9250.gyroCount[2]*mpu9250.gRes - mpu9250.gyroBias[2];   
+  //Set up I2C
+  i2c.frequency(400000);  // use fast (400 kHz) I2C  
   
-    mpu9250.readMagData(mpu9250.magCount);  // Read the x/y/z adc values   
+  //pc.printf("CPU SystemCoreClock is %d Hz\r\n", SystemCoreClock);   
+  
+  t.start();        
+  
+  
+    
+  // Read the WHO_AM_I register, this is a good test of communication
+  uint8_t whoami = mpu9250.readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250);  // Read WHO_AM_I register for MPU-9250
+  //pc.printf("I AM 0x%x\n\r", whoami); pc.printf("I SHOULD BE 0x71\n\r");
+  
+  if (whoami == 0x71) // WHO_AM_I should always be 0x68
+  {  
+    //pc.printf("MPU9250 WHO_AM_I is 0x%x\n\r", whoami);
+    //pc.printf("MPU9250 is online...\n\r");
+
+    wait(1);
+    
+    mpu9250.resetMPU9250(); // Reset registers to default in preparation for device calibration
+    mpu9250.MPU9250SelfTest(SelfTest); // Start by performing self test and reporting values
+    /*pc.printf("x-axis self test: acceleration trim within : %f % of factory value\n\r", SelfTest[0]);  
+    pc.printf("y-axis self test: acceleration trim within : %f % of factory value\n\r", SelfTest[1]);  
+    pc.printf("z-axis self test: acceleration trim within : %f % of factory value\n\r", SelfTest[2]);  
+    pc.printf("x-axis self test: gyration trim within : %f % of factory value\n\r", SelfTest[3]);  
+    pc.printf("y-axis self test: gyration trim within : %f % of factory value\n\r", SelfTest[4]);  
+    pc.printf("z-axis self test: gyration trim within : %f % of factory value\n\r", SelfTest[5]);  
+    */
+    mpu9250.calibrateMPU9250(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers  
+    /*
+    pc.printf("x gyro bias = %f\n\r", gyroBias[0]);
+    pc.printf("y gyro bias = %f\n\r", gyroBias[1]);
+    pc.printf("z gyro bias = %f\n\r", gyroBias[2]);
+    pc.printf("x accel bias = %f\n\r", accelBias[0]);
+    pc.printf("y accel bias = %f\n\r", accelBias[1]);
+    pc.printf("z accel bias = %f\n\r", accelBias[2]);
+    */
+    wait(2);
+    mpu9250.initMPU9250(); 
+    //pc.printf("MPU9250 initialized for active data mode....\n\r"); // Initialize device for active mode read of acclerometer, gyroscope, and temperature
+    mpu9250.initAK8963(magCalibration);
+    /*pc.printf("AK8963 initialized for active data mode....\n\r"); // Initialize device for active mode read of magnetometer
+    pc.printf("Accelerometer full-scale range = %f  g\n\r", 2.0f*(float)(1<<Ascale));
+    pc.printf("Gyroscope full-scale range = %f  deg/s\n\r", 250.0f*(float)(1<<Gscale));
+    if(Mscale == 0) pc.printf("Magnetometer resolution = 14  bits\n\r");
+    if(Mscale == 1) pc.printf("Magnetometer resolution = 16  bits\n\r");
+    if(Mmode == 2) pc.printf("Magnetometer ODR = 8 Hz\n\r");
+    if(Mmode == 6) pc.printf("Magnetometer ODR = 100 Hz\n\r");        */
+    wait(1);
+   }
+   else
+   {
+    pc.printf("Could not connect to MPU9250: \n\r");
+    pc.printf("%#x \n",  whoami);
+ 
+   
+ 
+    while(1) ; // Loop forever if communication doesn't happen
+    }
+
+    mpu9250.getAres(); // Get accelerometer sensitivity
+    mpu9250.getGres(); // Get gyro sensitivity
+    mpu9250.getMres(); // Get magnetometer sensitivity
+    /*pc.printf("Accelerometer sensitivity is %f LSB/g \n\r", 1.0f/aRes);
+    pc.printf("Gyroscope sensitivity is %f LSB/deg/s \n\r", 1.0f/gRes);
+    pc.printf("Magnetometer sensitivity is %f LSB/G \n\r", 1.0f/mRes);       */
+    magbias[0] = +470.;  // User environmental x-axis correction in milliGauss, should be automatically calculated
+    magbias[1] = +120.;  // User environmental x-axis correction in milliGauss
+    magbias[2] = +125.;  // User environmental x-axis correction in milliGauss
+       
+                myled2=!myled2;
+
+ while(1) {
+ 
+        myled2=!myled2;
+        myled=!myled;
+  // If intPin goes high, all data registers have new data
+  if(mpu9250.readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01) {  // On interrupt, check if data ready interrupt
+
+    mpu9250.readAccelData(accelCount);  // Read the x/y/z adc values   
+    // Now we'll calculate the accleration value into actual g's
+    ax = (float)accelCount[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
+    ay = (float)accelCount[1]*aRes - accelBias[1];   
+    az = (float)accelCount[2]*aRes - accelBias[2];  
+   
+    mpu9250.readGyroData(gyroCount);  // Read the x/y/z adc values
+    // Calculate the gyro value into actual degrees per second
+    gx = (float)gyroCount[0]*gRes - gyroBias[0];  // get actual gyro value, this depends on scale being set
+    gy = (float)gyroCount[1]*gRes - gyroBias[1];  
+    gz = (float)gyroCount[2]*gRes - gyroBias[2];   
+  
+    mpu9250.readMagData(magCount);  // Read the x/y/z adc values   
     // Calculate the magnetometer values in milliGauss
     // Include factory calibration per data sheet and user environmental corrections
-    mpu9250.mx = (float)mpu9250.magCount[0]*mpu9250.mRes*mpu9250.magCalibration[0] - mpu9250.magbias[0];  // get actual magnetometer value, this depends on scale being set
-    mpu9250.my = (float)mpu9250.magCount[1]*mpu9250.mRes*mpu9250.magCalibration[1] - mpu9250.magbias[1];  
-    mpu9250.mz = (float)mpu9250.magCount[2]*mpu9250.mRes*mpu9250.magCalibration[2] - mpu9250.magbias[2];   
+    mx = (float)magCount[0]*mRes*magCalibration[0] - magbias[0];  // get actual magnetometer value, this depends on scale being set
+    my = (float)magCount[1]*mRes*magCalibration[1] - magbias[1];  
+    mz = (float)magCount[2]*mRes*magCalibration[2] - magbias[2];   
   }
    
-    mpu9250.Now = t.read_us();
-    mpu9250.deltat = (float)((mpu9250.Now - mpu9250.lastUpdate)/1000000.0f) ; // set integration time by time elapsed since last filter update
-    mpu9250.lastUpdate = mpu9250.Now;
+    Now = t.read_us();
+    deltat = (float)((Now - lastUpdate)/1000000.0f) ; // set integration time by time elapsed since last filter update
+    lastUpdate = Now;
     
-    sum += mpu9250.deltat;
+    sum += deltat;
     sumCount++;
     
 //    if(lastUpdate - firstUpdate > 10000000.0f) {
@@ -92,36 +129,45 @@ int main()
  //   }
     
    // Pass gyro rate as rad/s
-  mpu9250.MadgwickQuaternionUpdate(mpu9250.ax, mpu9250.ay,mpu9250. az, mpu9250.gx*PI/180.0f,mpu9250. gy*PI/180.0f,mpu9250. gz*PI/180.0f, mpu9250. my,mpu9250.  mx,mpu9250. mz);
- // mpu9250.MahonyQuaternionUpdate(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f, my, mx, mz);
+//  mpu9250.MadgwickQuaternionUpdate(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f,  my,  mx, mz);
+  mpu9250.MahonyQuaternionUpdate(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f, my, mx, mz);
 
     // Serial print and/or display at 0.5 s rate independent of data rates
-     mpu9250.delt_t = t.read_ms() -  mpu9250.count;
-    if ( mpu9250.delt_t > 500) { // update LCD once per half-second independent of read rate
+    delt_t = t.read_ms() - count;
+   // if (delt_t > 500) { // update LCD once per half-second independent of read rate
+     /*
+    pc.printf("ax = %f", 1000*ax); 
+    pc.printf(" ay = %f", 1000*ay); 
+    pc.printf(" az = %f  mg\n\r", 1000*az); 
 
-    pc.printf("ax = %f", 1000* mpu9250.ax); 
-    pc.printf(" ay = %f", 1000* mpu9250.ay); 
-    pc.printf(" az = %f  mg\n\r", 1000* mpu9250.az); 
-
-    pc.printf("gx = %f",  mpu9250.gx); 
-    pc.printf(" gy = %f",  mpu9250.gy); 
-    pc.printf(" gz = %f  deg/s\n\r",  mpu9250.gz); 
+    pc.printf("gx = %f", gx); 
+    pc.printf(" gy = %f", gy); 
+    pc.printf(" gz = %f  deg/s\n\r", gz); 
     
-    pc.printf("gx = %f",  mpu9250.mx); 
-    pc.printf(" gy = %f",  mpu9250.my); 
-    pc.printf(" gz = %f  mG\n\r",  mpu9250.mz); 
+    pc.printf("gx = %f", mx); 
+    pc.printf(" gy = %f", my); 
+    pc.printf(" gz = %f  mG\n\r", mz); 
+     */
+    tempCount = mpu9250.readTempData();  // Read the adc values
+    temperature = ((float) tempCount) / 333.87f + 21.0f; // Temperature in degrees Centigrade
+     /*
+    pc.printf(" temperature = %f  C\n\r", temperature); 
     
-     mpu9250.tempCount = mpu9250.readTempData();  // Read the adc values
-     mpu9250.temperature = ((float)  mpu9250.tempCount) / 333.87f + 21.0f; // Temperature in degrees Centigrade
-    pc.printf(" temperature = %f  C\n\r",  mpu9250.temperature); 
-    
-    pc.printf("q0 = %f\n\r",  mpu9250.q[0]);
-    pc.printf("q1 = %f\n\r",  mpu9250.q[1]);
-    pc.printf("q2 = %f\n\r",  mpu9250.q[2]);
-    pc.printf("q3 = %f\n\r",  mpu9250.q[3]);      
-    }
-
-    
+    pc.printf("q0 = %f\n\r", q[0]);
+    pc.printf("q1 = %f\n\r", q[1]);
+    pc.printf("q2 = %f\n\r", q[2]);
+    pc.printf("q3 = %f\n\r", q[3]);      
+    */
+/*    lcd.clear();
+    lcd.printString("MPU9250", 0, 0);
+    lcd.printString("x   y   z", 0, 1);
+    sprintf(buffer, "%d %d %d mg", (int)(1000.0f*ax), (int)(1000.0f*ay), (int)(1000.0f*az));
+    lcd.printString(buffer, 0, 2);
+    sprintf(buffer, "%d %d %d deg/s", (int)gx, (int)gy, (int)gz);
+    lcd.printString(buffer, 0, 3);
+    sprintf(buffer, "%d %d %d mG", (int)mx, (int)my, (int)mz);
+    lcd.printString(buffer, 0, 4); 
+ */  
   // Define output variables from updated quaternion---these are Tait-Bryan angles, commonly used in aircraft orientation.
   // In this coordinate system, the positive z-axis is down toward Earth. 
   // Yaw is the angle between Sensor x-axis and Earth magnetic North (or true North if corrected for local declination, looking down on the sensor positive yaw is counterclockwise.
@@ -131,20 +177,35 @@ int main()
   // Tait-Bryan angles as well as Euler angles are non-commutative; that is, the get the correct orientation the rotations must be
   // applied in the correct order which for this configuration is yaw, pitch, and then roll.
   // For more see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles which has additional links.
-     mpu9250.yaw   = atan2(2.0f * ( mpu9250.q[1] *  mpu9250.q[2] +  mpu9250.q[0] *  mpu9250.q[3]),  mpu9250.q[0] *  mpu9250.q[0] +  mpu9250.q[1] *  mpu9250.q[1] -  mpu9250.q[2] *  mpu9250.q[2] -  mpu9250.q[3] *  mpu9250.q[3]);   
-     mpu9250.pitch = -asin(2.0f * ( mpu9250.q[1] *  mpu9250.q[3] -  mpu9250.q[0] *  mpu9250.q[2]));
-     mpu9250.roll  = atan2(2.0f * ( mpu9250.q[0] *  mpu9250.q[1] +  mpu9250.q[2] *  mpu9250.q[3]),  mpu9250.q[0] *  mpu9250.q[0] -  mpu9250.q[1] *  mpu9250.q[1] -  mpu9250.q[2] *  mpu9250.q[2] +  mpu9250.q[3] *  mpu9250.q[3]);
-     mpu9250.pitch *= 180.0f / PI;
-     mpu9250.yaw   *= 180.0f / PI; 
-     mpu9250.yaw   -= 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
-     mpu9250.roll  *= 180.0f / PI;
+    yaw   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);   
+    pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
+    roll  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+    pitch *= 180.0f / PI;
+    yaw   *= 180.0f / PI; 
+    yaw   -= 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+    roll  *= 180.0f / PI;
+     /*
+    pc.printf("Yaw, Pitch, Roll: %f %f %f\n\r", yaw, pitch, roll);
+    pc.printf("average rate = %f\n\r", (float) sumCount/sum);  */
+//    sprintf(buffer, "YPR: %f %f %f", yaw, pitch, roll);
+//    lcd.printString(buffer, 0, 4);
+//    sprintf(buffer, "rate = %f", (float) sumCount/sum);
+//    lcd.printString(buffer, 0, 5);
+      pc.printf("%f %f %f\n\r",gx,gy,gz);
 
-    pc.printf("Yaw, Pitch, Roll: %f %f %f\n\r",  mpu9250.yaw,  mpu9250.pitch, mpu9250. roll);
-    pc.printf("average rate = %f\n\r", (float) sumCount/sum);
- 
-    myled= !myled;
-    mpu9250.count = t.read_ms(); 
+    count = t.read_ms(); 
+
+    if(count > 1<<21) {
+        t.start(); // start the timer over again if ~30 minutes has passed
+        count = 0;
+        deltat= 0;
+        lastUpdate = t.read_us();
+            myled= !myled;
+            myled2=!myled2;
+   // }
     sum = 0;
     sumCount = 0; 
 }
 }
+ 
+ }

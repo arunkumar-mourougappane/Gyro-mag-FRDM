@@ -1,0 +1,64 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.16a
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Arunkumar Mourougappane, Cyient, LIC=GE745-GVX0P-04ESQ-NX5E6-IHFE2-ZU8LM
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Professional  Version: 5.16a
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 (build 20)
+Assembler:       Armasm.exe V5.06 (build 20)
+Linker/Locator:  ArmLink.exe V5.06 (build 20)
+Library Manager: ArmAr.exe V5.06 (build 20)
+Hex Converter:   FromElf.exe V5.06 (build 20)
+CPU DLL:         SARMCM3.DLL V5.16a
+Dialog DLL:      DCM.DLL V1.13.2.0
+Target DLL:      CMSIS_AGDI.dll V1.21.20.0
+Dialog DLL:      TCM.DLL V1.14.5.0
+ 
+<h2>Project:</h2>
+C:\Users\Arunkumar\OneDrive\Gyro-mag-FRDM\Gyro-mag-FRDM.uvprojx
+Project File Date:  10/10/2015
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 (build 20)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Rebuild target 'mbed FRDM-K64F'
+compiling main.cpp...
+MPU9250.h(663): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[0] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[0] - 1.0) )); // FT[Xa] factory trim calculation
+MPU9250.h(664): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[1] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[1] - 1.0) )); // FT[Ya] factory trim calculation
+MPU9250.h(665): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[2] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[2] - 1.0) )); // FT[Za] factory trim calculation
+MPU9250.h(666): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[3] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[3] - 1.0) )); // FT[Xg] factory trim calculation
+MPU9250.h(667): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[4] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[4] - 1.0) )); // FT[Yg] factory trim calculation
+MPU9250.h(668): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+     factoryTrim[5] = (float)(2620/1<<FS)*(pow( 1.01 , ((float)selfTest[5] - 1.0) )); // FT[Zg] factory trim calculation
+MPU9250.h(673): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+       destination[i] = 100.0*((float)(aSTAvg[i] - aAvg[i]))/factoryTrim[i]; // Report percent differences
+MPU9250.h(674): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+       destination[i+3] = 100.0*((float)(gSTAvg[i] - gAvg[i]))/factoryTrim[i+3]; // Report percent differences
+MPU9250.h(875): warning:  #1-D: last line of file ends without a newline
+  #endif
+"main.cpp": creating precompiled header file "build\main.pch"
+main.cpp: 9 warnings, 0 errors
+linking...
+Program Size: Code=35224 RO-data=4748 RW-data=232 ZI-data=568  
+After Build - User command #1: fromelf --bin -o build\MPU9250AHRS_K64F.bin build\MPU9250AHRS.axf
+".\build\MPU9250AHRS.axf" - 0 Error(s), 9 Warning(s).
+
+<h2>Collection of Component include folders:</h2>
+  C:\Users\Arunkumar\OneDrive\Gyro-mag-FRDM\RTE
+  C:\Keil_v5\ARM\PACK\Keil\Kinetis_K60_DFP\1.4.0\Device\Include
+
+<h2>Collection of Component Files used:</h2>
+Build Time Elapsed:  00:00:09
+</pre>
+</body>
+</html>
