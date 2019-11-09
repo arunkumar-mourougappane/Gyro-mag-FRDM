@@ -209,7 +209,7 @@ float temperature;
 float SelfTest[6];
 
 int delt_t = 0; // used to control display output rate
-int count = 0;  // used to control display output rate
+int delayCount = 0;  // used to control display output rate
 
 // parameters for 6 DoF sensor fusion calculations
 float PI = 3.14159265358979323846f;

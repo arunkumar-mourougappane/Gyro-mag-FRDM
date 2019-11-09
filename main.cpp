@@ -133,7 +133,7 @@ int main()
   mpu9250.MahonyQuaternionUpdate(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f, my, mx, mz);
 
     // Serial print and/or display at 0.5 s rate independent of data rates
-    delt_t = t.read_ms() - count;
+    delt_t = t.read_ms() - delayCount;
    // if (delt_t > 500) { // update LCD once per half-second independent of read rate
      /*
     pc.printf("ax = %f", 1000*ax); 
@@ -193,11 +193,11 @@ int main()
 //    lcd.printString(buffer, 0, 5);
       pc.printf("%f %f %f\n\r",gx,gy,gz);
 
-    count = t.read_ms(); 
+    delayCount = t.read_ms(); 
 
-    if(count > 1<<21) {
+    if(delayCount > 1<<21) {
         t.start(); // start the timer over again if ~30 minutes has passed
-        count = 0;
+        delayCount = 0;
         deltat= 0;
         lastUpdate = t.read_us();
             myled= !myled;
