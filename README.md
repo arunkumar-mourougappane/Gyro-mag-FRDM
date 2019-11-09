@@ -1,6 +1,8 @@
-# Gyro-mag-FRDM 
+# 9DoF Gyroscope interfacing library with FRDMk64  
 
-    [![Build Status](https://travis-ci.com/arunkumar-mourougappane/Gyro-mag-FRDM.svg?branch=master)](https://travis-ci.com/arunkumar-mourougappane/Gyro-mag-FRDM)
+Build Status: [![Build Status](https://travis-ci.com/arunkumar-mourougappane/Gyro-mag-FRDM.svg?branch=master)](https://travis-ci.com/arunkumar-mourougappane/Gyro-mag-FRDM)
+
+
     
     README
     Explains contents of Gyro-mag-FRDM
