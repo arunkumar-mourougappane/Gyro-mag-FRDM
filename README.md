@@ -1,5 +1,7 @@
-# Gyro-mag-FRDM
+# Gyro-mag-FRDM 
 
+    [![Build Status](https://travis-ci.com/arunkumar-mourougappane/Gyro-mag-FRDM.svg?branch=master)](https://travis-ci.com/arunkumar-mourougappane/Gyro-mag-FRDM)
+    
     README
     Explains contents of Gyro-mag-FRDM
     Author : Arunkumar Mourougappane
